@@ -1,21 +1,23 @@
-FROM node:latest
-# Create app Directory
-WORKDIR  /home/ubuntu/youtube-clone
+# Stage 1: Build
+FROM node:14-alpine as build
+WORKDIR /home/ubuntu/youtube-clone
 
-#Install app depenencies
-
+# Copy package.json and package-lock.json and install dependencies
 COPY package*.json ./
+RUN npm ci --only=production && npm cache clean --force
 
-#Copying package.json and package-lock.json (if its exists) from the local directory to the working directory.
+# Copy the rest of the application source code
+COPY . .
 
-RUN npm install
-#Install the dependencies in your packge json.file
+# Stage 2: Run
+FROM node:14-alpine
+WORKDIR /home/ubuntu/youtube-clone
 
-COPY . /home/ubuntu/youtube-clone
-#Copies the source code from your local directory to container working directory
+# Copy the built application from the previous stage
+COPY --from=build /home/ubuntu/youtube-clone .
 
+# Expose the application's port
 EXPOSE 3000
-#Indicates the application inside the container will listen on port 3000
 
-CMD [ "npm","start"]
-#Indicates the default command when the container is started from the image
+# Set the command to run the application
+CMD ["npm", "start"]
