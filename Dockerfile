@@ -1,5 +1,5 @@
 # Stage 1: Build
-FROM node:14-alpine as build
+FROM node:14-alpine AS build
 WORKDIR /home/ubuntu/youtube-clone
 
 # Copy package.json and package-lock.json and install dependencies
@@ -10,7 +10,7 @@ RUN npm ci --only=production && npm cache clean --force
 COPY . .
 
 # Stage 2: Run
-FROM node:14-alpine
+FROM node:14-alpine AS runtime
 WORKDIR /home/ubuntu/youtube-clone
 
 # Copy the built application from the previous stage
